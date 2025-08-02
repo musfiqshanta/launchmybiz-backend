@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "apis": [
+    {
+      "identifier": "corpnet",
+      "source": "@corpnet/v1.0#b0qilejmbqo31ph",
+      "integrity": "sha512-lkuQCgmOxlqRb29P5jRfUM8QRmP/Y9pcQUkjGzZPCFmCMGHXzkWw6fDfa0Nsma1FoyTy5+YEfbTP0M6JfO+y/w==",
+      "installerVersion": "6.1.3"
+    }
+  ]
+}

@@ -1,0 +1,2057 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "CorpNet Business Formation API",
+    "version": "1.0.0",
+    "description": "API for managing business formation orders."
+  },
+  "servers": [
+    {
+      "url": "https://api.staging24.corpnet.com/api"
+    }
+  ],
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ],
+  "paths": {
+    "/business-formation-v2/package": {
+      "get": {
+        "tags": [
+          "Business Formation"
+        ],
+        "summary": "Get Formation Packages",
+        "description": "Retrieve a list of available formation packages based on the selected entity type, state, and filing option.",
+        "parameters": [
+          {
+            "name": "entityType",
+            "in": "query",
+            "required": true,
+            "description": "Type of business entity to form. Possible values are - LLC, C-Corp, S-Corp, Non-Profit Corporation, and Professional Corporation.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "LLC"
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "description": "The state in which the business is being formed.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "California"
+          },
+          {
+            "name": "filing",
+            "in": "query",
+            "required": true,
+            "description": "The type of filing service requested (e.g., standard, express).",
+            "schema": {
+              "type": "string"
+            },
+            "example": "standard"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of available packages by state, entity, and filing type.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "The response object containing available business formation packages.",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "A human-readable status message.",
+                      "example": "OK"
+                    },
+                    "statusCode": {
+                      "type": "string",
+                      "description": "The HTTP status code of the response in string format.",
+                      "example": "200"
+                    },
+                    "value": {
+                      "type": "object",
+                      "description": "Contains the package collection based on query parameters.",
+                      "properties": {
+                        "packageCollection": {
+                          "type": "array",
+                          "description": "A list of available formation packages.",
+                          "items": {
+                            "type": "object",
+                            "description": "Details of a specific package offering.",
+                            "properties": {
+                              "entityType": {
+                                "type": "string",
+                                "description": "The type of business entity the package applies to (e.g., llc, corp).",
+                                "example": "llc"
+                              },
+                              "name": {
+                                "type": "string",
+                                "description": "The name of the package (e.g., Basic Package, Premium Package).",
+                                "example": "Basic Package"
+                              },
+                              "state": {
+                                "type": "string",
+                                "description": "The U.S. state where the package is applicable.",
+                                "example": "California"
+                              },
+                              "productPackages": {
+                                "type": "array",
+                                "description": "List of individual services or features included in the package.",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "name": {
+                                      "type": "string",
+                                      "description": "The name of the service included in the package.",
+                                      "example": "Name Availability Check"
+                                    },
+                                    "price": {
+                                      "type": "number",
+                                      "format": "float",
+                                      "description": "The price of the individual service in USD.",
+                                      "example": 34
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "message": "OK",
+                    "statusCode": "200",
+                    "value": {
+                      "packageCollection": [
+                        {
+                          "entityType": "llc",
+                          "name": "Basic Package",
+                          "state": "California",
+                          "productPackages": [
+                            {
+                              "name": "Name Availability Check",
+                              "price": 34
+                            },
+                            {
+                              "name": "Print Delivery",
+                              "price": 29
+                            },
+                            {
+                              "name": "Operating Agreement",
+                              "price": 34
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – Missing or invalid query parameters.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "errorMessage": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": [
+                        "Entity is required."
+                      ]
+                    },
+                    "data": {
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized – Invalid or missing authentication token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "errorMessage": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": [
+                        "Invalid API key."
+                      ]
+                    },
+                    "data": {
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden – You do not have access to this resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 403
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "errorMessage": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": [
+                        "API key is missing."
+                      ]
+                    },
+                    "data": {
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error – An unexpected error occurred on the server.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 500
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "errorMessage": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": [
+                        "Something went wrong. Please try again later."
+                      ]
+                    },
+                    "data": {
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/business-formation-v2/create-order": {
+      "post": {
+        "tags": [
+          "Business Formation"
+        ],
+        "summary": "Create a Business Formation Order",
+        "description": "Creates a new business formation order using partner-supplied details including contact, company info, business address, selected package, and products.",
+        "requestBody": {
+          "required": true,
+          "description": "Payload containing all necessary information to create a business formation order.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "partnerOrder"
+                ],
+                "properties": {
+                  "partnerOrder": {
+                    "type": "object",
+                    "required": [
+                      "apiUserPid",
+                      "pcid",
+                      "businessStructureType",
+                      "businessStateInitial",
+                      "orderTotalPrice",
+                      "contact",
+                      "companyInfo",
+                      "businessAddress",
+                      "registerAgent",
+                      "packageId",
+                      "products"
+                    ],
+                    "properties": {
+                      "apiUserPid": {
+                        "type": "string",
+                        "description": "API user identifier assigned to the partner.",
+                        "example": "14684"
+                      },
+                      "pcid": {
+                        "type": "string",
+                        "description": "Partner client identifier used to track the request.",
+                        "example": "gregerger"
+                      },
+                      "businessStructureType": {
+                        "type": "string",
+                        "description": "Type of business entity being formed (e.g., LLC, Corporation).",
+                        "example": "LLC"
+                      },
+                      "businessStateInitial": {
+                        "type": "string",
+                        "description": "Two-letter abbreviation of the U.S. state where the business is being formed.",
+                        "example": "CA"
+                      },
+                      "orderTotalPrice": {
+                        "type": "string",
+                        "description": "Total price of the order in USD.",
+                        "example": "200"
+                      },
+                      "contact": {
+                        "type": "object",
+                        "properties": {
+                          "contactEmail": {
+                            "type": "string",
+                            "format": "email",
+                            "description": "Email address of the primary contact person.",
+                            "example": "test1@test.com"
+                          },
+                          "contactFirstName": {
+                            "type": "string",
+                            "description": "First name of the contact person.",
+                            "example": "test"
+                          },
+                          "contactLastName": {
+                            "type": "string",
+                            "description": "Last name of the contact person.",
+                            "example": "test"
+                          },
+                          "contactPhone": {
+                            "type": "string",
+                            "description": "Primary phone number of the contact person.",
+                            "example": "1234567891"
+                          },
+                          "contactEveningPhone": {
+                            "type": "string",
+                            "description": "Optional evening phone number of the contact person.",
+                            "example": ""
+                          }
+                        }
+                      },
+                      "companyInfo": {
+                        "type": "object",
+                        "properties": {
+                          "companyDesiredName": {
+                            "type": "string",
+                            "description": "Desired name for the new business entity.",
+                            "example": "Test company"
+                          },
+                          "companyAlternativeName": {
+                            "type": "string",
+                            "description": "Optional alternative business name.",
+                            "example": ""
+                          },
+                          "companyBusinessCategory": {
+                            "type": "string",
+                            "description": "Category of business operations (e.g., retail, services).",
+                            "example": "other"
+                          },
+                          "companyBusinessDescription": {
+                            "type": "string",
+                            "description": "Brief description of the business activities.",
+                            "example": "testing"
+                          }
+                        }
+                      },
+                      "businessAddress": {
+                        "type": "object",
+                        "properties": {
+                          "businessAddressCountry": {
+                            "type": "string",
+                            "description": "Country of the business address.",
+                            "example": "US"
+                          },
+                          "businessAddressAddress1": {
+                            "type": "string",
+                            "description": "Primary street address of the business.",
+                            "example": "test"
+                          },
+                          "businessAddressAddress2": {
+                            "type": "string",
+                            "description": "Secondary address (optional).",
+                            "example": ""
+                          },
+                          "businessAddressCity": {
+                            "type": "string",
+                            "description": "City name of the business address.",
+                            "example": "test"
+                          },
+                          "businessAddressState": {
+                            "type": "string",
+                            "description": "State abbreviation of the business address.",
+                            "example": "CA"
+                          },
+                          "businessAddressZip": {
+                            "type": "string",
+                            "description": "ZIP or postal code of the business address.",
+                            "example": "78671"
+                          }
+                        }
+                      },
+                      "registerAgent": {
+                        "type": "object",
+                        "properties": {
+                          "registeredAgentIsCorpnetAgent": {
+                            "type": "boolean",
+                            "description": "Indicates if CorpNet will act as the registered agent.",
+                            "example": true
+                          },
+                          "registeredAgentFirstName": {
+                            "type": "string",
+                            "description": "First name of the registered agent (if not CorpNet).",
+                            "example": ""
+                          },
+                          "registeredAgentLastName": {
+                            "type": "string",
+                            "description": "Last name of the registered agent (if not CorpNet).",
+                            "example": ""
+                          },
+                          "registeredAgentAddress1": {
+                            "type": "string",
+                            "description": "Registered agent’s address line 1.",
+                            "example": ""
+                          },
+                          "registeredAgentAddress2": {
+                            "type": "string",
+                            "description": "Registered agent’s address line 2 (optional).",
+                            "example": ""
+                          },
+                          "registeredAgentCity": {
+                            "type": "string",
+                            "description": "City of the registered agent.",
+                            "example": ""
+                          },
+                          "registeredAgentState": {
+                            "type": "string",
+                            "description": "State of the registered agent.",
+                            "example": ""
+                          },
+                          "registeredAgentZip": {
+                            "type": "string",
+                            "description": "ZIP code of the registered agent.",
+                            "example": ""
+                          },
+                          "registeredAgentCountry": {
+                            "type": "string",
+                            "description": "Country of the registered agent.",
+                            "example": ""
+                          }
+                        }
+                      },
+                      "packageId": {
+                        "type": "string",
+                        "description": "Identifier for the selected business formation package.",
+                        "example": "01tUS000009xuhDYAQ"
+                      },
+                      "products": {
+                        "type": "array",
+                        "description": "List of products included in the order.",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "productId": {
+                              "type": "string",
+                              "description": "Identifier for the product to include.",
+                              "example": "01tUS000009xuh7YAA"
+                            },
+                            "quantity": {
+                              "type": "string",
+                              "description": "Quantity of the selected product.",
+                              "example": "1"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Business formation order created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "The response returned after successfully creating a business formation order.",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "description": "HTTP status code indicating the result of the request.",
+                      "example": 201
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Status message indicating the result.",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Contains the created order details.",
+                      "properties": {
+                        "partnerOrder": {
+                          "type": "object",
+                          "description": "The partner's submitted order with assigned metadata.",
+                          "properties": {
+                            "orderGuid": {
+                              "type": "string",
+                              "description": "Unique identifier for the created order.",
+                              "example": "801VB00000LcJlVYAV"
+                            },
+                            "orderPhase": {
+                              "type": "string",
+                              "description": "Current processing phase of the order.",
+                              "example": "Order Received"
+                            },
+                            "orderStatus": {
+                              "type": "string",
+                              "description": "Current status of the order.",
+                              "example": "Third Party Received"
+                            },
+                            "orderFilingType": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Type of filing service selected (if any).",
+                              "example": null
+                            },
+                            "apiUserPid": {
+                              "type": "string",
+                              "description": "API user ID that initiated the order.",
+                              "example": "14684"
+                            },
+                            "pcid": {
+                              "type": "string",
+                              "description": "Partner Client ID.",
+                              "example": "gregerger"
+                            },
+                            "businessStructureType": {
+                              "type": "string",
+                              "description": "Full description of the business structure selected.",
+                              "example": "Limited Liability Company (LLC)"
+                            },
+                            "businessStateInitial": {
+                              "type": "string",
+                              "description": "State abbreviation where the business is being formed."
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request or missing required fields."
+          },
+          "401": {
+            "description": "Authentication required or token invalid."
+          },
+          "500": {
+            "description": "Server error occurred while processing the request."
+          }
+        }
+      }
+    },
+    "/business-formation-v2/order-summary/{orderId}": {
+      "get": {
+        "tags": [
+          "Business Formation"
+        ],
+        "summary": "Get Order Summary",
+        "description": "Retrieve a summary of a submitted business formation order, including order total and purchased products.",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier of the business formation order to retrieve the summary for.",
+            "schema": {
+              "type": "string",
+              "example": "801VB00000LcJlVYAV"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved order summary.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "The response containing a summary of a submitted business formation order.",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string",
+                      "description": "HTTP status code of the response.",
+                      "example": "200"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "A human-readable message indicating success or error.",
+                      "example": "OK"
+                    },
+                    "order": {
+                      "type": "object",
+                      "description": "Summary details of the business formation order.",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "Unique identifier of the order.",
+                          "example": "801VB00000LcJlVYAV"
+                        },
+                        "orderNumber": {
+                          "type": "string",
+                          "description": "Public-facing order number assigned to the order.",
+                          "example": "07237721"
+                        },
+                        "orderTotal": {
+                          "type": "number",
+                          "format": "float",
+                          "description": "Total price of the order including all selected products.",
+                          "example": 298.04
+                        },
+                        "orderProducts": {
+                          "type": "array",
+                          "description": "List of all products included in the order with their respective values.",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "description": "Name of the ordered product or service.",
+                                "example": "Obtain Federal Tax ID Number (EIN)"
+                              },
+                              "value": {
+                                "type": "number",
+                                "format": "float",
+                                "description": "Price or value of the individual product in USD.",
+                                "example": 33
+                              },
+                              "sortOrder": {
+                                "type": "integer",
+                                "description": "Sort order indicator for product display.",
+                                "example": 2
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "statusCode": "200",
+                    "message": "OK",
+                    "order": {
+                      "id": "801VB00000LcJlVYAV",
+                      "orderNumber": "07237721",
+                      "orderTotal": 298.04,
+                      "orderProducts": [
+                        {
+                          "name": "Obtain Federal Tax ID Number (EIN)",
+                          "value": 33,
+                          "sortOrder": 2
+                        },
+                        {
+                          "name": "Custom Operating Agreement and Minutes",
+                          "value": 34,
+                          "sortOrder": 2
+                        },
+                        {
+                          "name": "FREE Corporate Compliance Tool",
+                          "value": 0,
+                          "sortOrder": 2
+                        },
+                        {
+                          "name": "California Registered Agent Service",
+                          "value": 2.92,
+                          "sortOrder": 3
+                        },
+                        {
+                          "name": "CUSTOMIZED LLC Kit & Seal",
+                          "value": 54,
+                          "sortOrder": 2
+                        },
+                        {
+                          "name": "Print Delivery",
+                          "value": 29,
+                          "sortOrder": 4
+                        },
+                        {
+                          "name": "California Official Filed Articles of Organization",
+                          "value": 79,
+                          "sortOrder": 2
+                        },
+                        {
+                          "name": "Name Availability Check",
+                          "value": 34,
+                          "sortOrder": 2
+                        },
+                        {
+                          "name": "Organizer Resolutions",
+                          "value": 0,
+                          "sortOrder": 2
+                        }
+                      ]
+                    }
+                  }
+                },
+                "example": {
+                  "statusCode": "200",
+                  "message": "OK",
+                  "order": {
+                    "id": "801VB00000LcJlVYAV",
+                    "orderNumber": "07237721",
+                    "orderTotal": 298.04,
+                    "orderProducts": [
+                      {
+                        "name": "Obtain Federal Tax ID Number (EIN)",
+                        "value": 33,
+                        "sortOrder": 2
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or missing order ID."
+          },
+          "404": {
+            "description": "No order found for the given order ID."
+          },
+          "500": {
+            "description": "Server error occurred while retrieving the order summary."
+          }
+        }
+      }
+    },
+    "/business-formation-v2/get-order/{orderId}": {
+      "get": {
+        "tags": [
+          "business formation"
+        ],
+        "summary": "Get Full Order Details",
+        "description": "Retrieve the full details of a submitted business formation order including contact, address, company info, and processing status.",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier of the order to retrieve full detail.",
+            "schema": {
+              "type": "string",
+              "example": "801VB00000LcJlVYAV"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved full order details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "The full response containing all details of a submitted business formation order.",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string",
+                      "description": "HTTP status code of the response.",
+                      "example": "200"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "A human-readable message indicating success or failure.",
+                      "example": "OK"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "Wrapper for partner order data.",
+                      "properties": {
+                        "partnerOrder": {
+                          "type": "object",
+                          "description": "Full detail of the submitted business formation order.",
+                          "properties": {
+                            "orderGuid": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Unique identifier assigned to the order.",
+                              "example": null
+                            },
+                            "orderPhase": {
+                              "type": "string",
+                              "description": "The current phase of the order lifecycle.",
+                              "example": "Order Received"
+                            },
+                            "orderStatus": {
+                              "type": "string",
+                              "description": "Current status of the order in the system.",
+                              "example": "Third Party Received"
+                            },
+                            "orderFilingType": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Filing type of the order, if applicable.",
+                              "example": null
+                            },
+                            "apiUserPid": {
+                              "type": "string",
+                              "description": "ID of the API user who submitted the order.",
+                              "example": "14684"
+                            },
+                            "pcid": {
+                              "type": "string",
+                              "description": "Partner Client Identifier.",
+                              "example": "gregerger"
+                            },
+                            "businessStructureType": {
+                              "type": "string",
+                              "description": "Full name of the selected business entity structure.",
+                              "example": "Limited Liability Company (LLC)"
+                            },
+                            "businessStateInitial": {
+                              "type": "string",
+                              "description": "Full name of the U.S. state where the business is being formed.",
+                              "example": "California"
+                            },
+                            "orderTotalPrice": {
+                              "type": "number",
+                              "format": "float",
+                              "description": "Total price of the order in USD.",
+                              "example": 298.04
+                            },
+                            "contact": {
+                              "type": "object",
+                              "description": "Contact person information for the order.",
+                              "properties": {
+                                "contactEmail": {
+                                  "type": "string",
+                                  "format": "email",
+                                  "example": "test1@test.com"
+                                },
+                                "contactFirstName": {
+                                  "type": "string",
+                                  "example": "test"
+                                },
+                                "contactLastName": {
+                                  "type": "string",
+                                  "example": "test"
+                                },
+                                "contactPhone": {
+                                  "type": "string",
+                                  "nullable": true,
+                                  "example": null
+                                },
+                                "contactEveningPhone": {
+                                  "type": "string",
+                                  "nullable": true,
+                                  "example": null
+                                }
+                              }
+                            },
+                            "companyInfo": {
+                              "type": "object",
+                              "description": "Information about the company being formed.",
+                              "properties": {
+                                "companyDesiredName": {
+                                  "type": "string",
+                                  "example": "Test company"
+                                },
+                                "companyAlternativeName": {
+                                  "type": "string",
+                                  "nullable": true,
+                                  "example": null
+                                },
+                                "companyBusinessDescription": {
+                                  "type": "string",
+                                  "example": "testing"
+                                },
+                                "companyBusinessCategory": {
+                                  "type": "string",
+                                  "example": "OTHER"
+                                }
+                              }
+                            },
+                            "businessAddress": {
+                              "type": "object",
+                              "description": "Physical address where the business will be located.",
+                              "properties": {
+                                "businessAddressCountry": {
+                                  "type": "string",
+                                  "example": "United States"
+                                },
+                                "businessAddressAddress1": {
+                                  "type": "string",
+                                  "example": "test"
+                                },
+                                "businessAddressAddress2": {
+                                  "type": "string",
+                                  "nullable": true,
+                                  "example": null
+                                },
+                                "businessAddressCity": {
+                                  "type": "string",
+                                  "example": "test"
+                                },
+                                "businessAddressState": {
+                                  "type": "string",
+                                  "nullable": true,
+                                  "example": null
+                                },
+                                "businessAddressZip": {
+                                  "type": "string",
+                                  "example": "78671"
+                                }
+                              }
+                            },
+                            "registerAgent": {
+                              "type": "object",
+                              "nullable": true,
+                              "description": "Registered agent information if available.",
+                              "example": null
+                            },
+                            "responsibleParty": {
+                              "type": "object",
+                              "nullable": true,
+                              "description": "Responsible party details if provided.",
+                              "example": null
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "statusCode": "200",
+                    "message": "OK",
+                    "data": {
+                      "partnerOrder": {
+                        "orderGuid": null,
+                        "orderPhase": "Order Received",
+                        "orderStatus": "Third Party Received",
+                        "orderFilingType": null,
+                        "apiUserPid": "14684",
+                        "pcid": "gregerger",
+                        "businessStructureType": "Limited Liability Company (LLC)",
+                        "businessStateInitial": "California",
+                        "orderTotalPrice": 298.04,
+                        "contact": {
+                          "contactEmail": "test1@test.com",
+                          "contactFirstName": "test",
+                          "contactLastName": "test",
+                          "contactPhone": null,
+                          "contactEveningPhone": null
+                        },
+                        "companyInfo": {
+                          "companyDesiredName": "Test company",
+                          "companyAlternativeName": null,
+                          "companyBusinessDescription": "testing",
+                          "companyBusinessCategory": "OTHER"
+                        },
+                        "businessAddress": {
+                          "businessAddressCountry": "United States",
+                          "businessAddressAddress1": "test",
+                          "businessAddressAddress2": null,
+                          "businessAddressCity": "test",
+                          "businessAddressState": null,
+                          "businessAddressZip": "78671"
+                        },
+                        "registerAgent": null,
+                        "responsibleParty": null
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or missing order ID."
+          },
+          "404": {
+            "description": "Order not found."
+          },
+          "500": {
+            "description": "Server error occurred while retrieving order details."
+          }
+        }
+      }
+    },
+    "/business-formation/order-cancellation-v1/{orderGuid}": {
+      "post": {
+        "tags": [
+          "Business Formation"
+        ],
+        "summary": "Cancel a Business Formation Order",
+        "description": "Cancels a business formation order using the provided order GUID. This action is irreversible.",
+        "parameters": [
+          {
+            "name": "orderGuid",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier for the order to be cancelled. This GUID is generated during order creation.",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "example": "a1b2c3d4-e5f6-7890-ab12-cd34ef567890"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order cancellation successful.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "string",
+                      "example": "200"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "OK"
+                    },
+                    "data": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "orderCancelled": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – Invalid or missing orderGuid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "errorMessage": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": [
+                        "Invalid order GUID."
+                      ]
+                    },
+                    "data": {
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized – Invalid or missing authentication token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "errorMessage": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": [
+                        "Invalid API key."
+                      ]
+                    },
+                    "data": {
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden – Access denied for this resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 403
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "errorMessage": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": [
+                        "API key is missing."
+                      ]
+                    },
+                    "data": {
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error – Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "example": 500
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "errorMessage": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "example": [
+                        "Something went wrong. Please try again later."
+                      ]
+                    },
+                    "data": {
+                      "nullable": true,
+                      "example": null
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/business-formation/download-order-document-v1/": {
+      "post": {
+        "tags": [
+          "Business Formation"
+        ],
+        "summary": "Download Order Document",
+        "description": "Downloads a document associated with a formation order.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "orderId": "801VB00000LcJlVYAV",
+                "documentType": "formationCertificate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Document download successful.",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized."
+          },
+          "404": {
+            "description": "Document not found."
+          }
+        }
+      }
+    },
+    "/business-formation/send-order-document-v1/": {
+      "post": {
+        "tags": [
+          "Business Formation"
+        ],
+        "summary": "Email Order Document",
+        "description": "Sends a document via email related to a business formation order.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "orderId": "801VB00000LcJlVYAV",
+                "email": "client@example.com",
+                "documentType": "formationCertificate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Document sent via email."
+          },
+          "400": {
+            "description": "Invalid request or email failed."
+          },
+          "401": {
+            "description": "Unauthorized."
+          }
+        }
+      }
+    },
+    "/business-formation/update-order-v1/": {
+      "post": {
+        "tags": [
+          "Business Formation"
+        ],
+        "summary": "Update Order Information",
+        "description": "Updates the details of an existing business formation order.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "orderId": "801VB00000LcJlVYAV",
+                "updateData": {
+                  "contact": {
+                    "contactEmail": "newemail@example.com",
+                    "contactPhone": "9876543210"
+                  },
+                  "companyInfo": {
+                    "companyDesiredName": "Updated Company Name"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Order updated successfully."
+          },
+          "400": {
+            "description": "Invalid data or order cannot be updated."
+          },
+          "401": {
+            "description": "Unauthorized."
+          },
+          "404": {
+            "description": "Order not found."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "CreateOrderRequest": {
+        "type": "object",
+        "required": [
+          "partnerOrder"
+        ],
+        "properties": {
+          "partnerOrder": {
+            "type": "object",
+            "required": [
+              "apiUserPid",
+              "pcid",
+              "businessStructureType",
+              "businessStateInitial",
+              "orderTotalPrice",
+              "contact",
+              "companyInfo",
+              "businessAddress",
+              "registerAgent",
+              "packageId",
+              "products"
+            ],
+            "properties": {
+              "apiUserPid": {
+                "type": "string",
+                "description": "API user identifier assigned to the partner.",
+                "example": "14684"
+              },
+              "pcid": {
+                "type": "string",
+                "description": "Partner client identifier used to track the request.",
+                "example": "gregerger"
+              },
+              "businessStructureType": {
+                "type": "string",
+                "description": "Type of business entity being formed (e.g., LLC, Corporation).",
+                "example": "LLC"
+              },
+              "businessStateInitial": {
+                "type": "string",
+                "description": "Two-letter abbreviation of the U.S. state where the business is being formed.",
+                "example": "CA"
+              },
+              "orderTotalPrice": {
+                "type": "string",
+                "description": "Total price of the order in USD.",
+                "example": "200"
+              },
+              "contact": {
+                "type": "object",
+                "properties": {
+                  "contactEmail": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email address of the primary contact person.",
+                    "example": "test1@test.com"
+                  },
+                  "contactFirstName": {
+                    "type": "string",
+                    "description": "First name of the contact person.",
+                    "example": "test"
+                  },
+                  "contactLastName": {
+                    "type": "string",
+                    "description": "Last name of the contact person.",
+                    "example": "test"
+                  },
+                  "contactPhone": {
+                    "type": "string",
+                    "description": "Primary phone number of the contact person.",
+                    "example": "1234567891"
+                  },
+                  "contactEveningPhone": {
+                    "type": "string",
+                    "description": "Optional evening phone number of the contact person.",
+                    "example": ""
+                  }
+                }
+              },
+              "companyInfo": {
+                "type": "object",
+                "properties": {
+                  "companyDesiredName": {
+                    "type": "string",
+                    "description": "Desired name for the new business entity.",
+                    "example": "Test company"
+                  },
+                  "companyAlternativeName": {
+                    "type": "string",
+                    "description": "Optional alternative business name.",
+                    "example": ""
+                  },
+                  "companyBusinessCategory": {
+                    "type": "string",
+                    "description": "Category of business operations (e.g., retail, services).",
+                    "example": "other"
+                  },
+                  "companyBusinessDescription": {
+                    "type": "string",
+                    "description": "Brief description of the business activities.",
+                    "example": "testing"
+                  }
+                }
+              },
+              "businessAddress": {
+                "type": "object",
+                "properties": {
+                  "businessAddressCountry": {
+                    "type": "string",
+                    "description": "Country of the business address.",
+                    "example": "US"
+                  },
+                  "businessAddressAddress1": {
+                    "type": "string",
+                    "description": "Primary street address of the business.",
+                    "example": "test"
+                  },
+                  "businessAddressAddress2": {
+                    "type": "string",
+                    "description": "Secondary address (optional).",
+                    "example": ""
+                  },
+                  "businessAddressCity": {
+                    "type": "string",
+                    "description": "City name of the business address.",
+                    "example": "test"
+                  },
+                  "businessAddressState": {
+                    "type": "string",
+                    "description": "State abbreviation of the business address.",
+                    "example": "CA"
+                  },
+                  "businessAddressZip": {
+                    "type": "string",
+                    "description": "ZIP or postal code of the business address.",
+                    "example": "78671"
+                  }
+                }
+              },
+              "registerAgent": {
+                "type": "object",
+                "properties": {
+                  "registeredAgentIsCorpnetAgent": {
+                    "type": "boolean",
+                    "description": "Indicates if CorpNet will act as the registered agent.",
+                    "example": true
+                  },
+                  "registeredAgentFirstName": {
+                    "type": "string",
+                    "description": "First name of the registered agent (if not CorpNet).",
+                    "example": ""
+                  },
+                  "registeredAgentLastName": {
+                    "type": "string",
+                    "description": "Last name of the registered agent (if not CorpNet).",
+                    "example": ""
+                  },
+                  "registeredAgentAddress1": {
+                    "type": "string",
+                    "description": "Registered agent’s address line 1.",
+                    "example": ""
+                  },
+                  "registeredAgentAddress2": {
+                    "type": "string",
+                    "description": "Registered agent’s address line 2 (optional).",
+                    "example": ""
+                  },
+                  "registeredAgentCity": {
+                    "type": "string",
+                    "description": "City of the registered agent.",
+                    "example": ""
+                  },
+                  "registeredAgentState": {
+                    "type": "string",
+                    "description": "State of the registered agent.",
+                    "example": ""
+                  },
+                  "registeredAgentZip": {
+                    "type": "string",
+                    "description": "ZIP code of the registered agent.",
+                    "example": ""
+                  },
+                  "registeredAgentCountry": {
+                    "type": "string",
+                    "description": "Country of the registered agent.",
+                    "example": ""
+                  }
+                }
+              },
+              "packageId": {
+                "type": "string",
+                "description": "Identifier for the selected business formation package.",
+                "example": "01tUS000009xuhDYAQ"
+              },
+              "products": {
+                "type": "array",
+                "description": "List of products included in the order.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "productId": {
+                      "type": "string",
+                      "description": "Identifier for the product to include.",
+                      "example": "01tUS000009xuh7YAA"
+                    },
+                    "quantity": {
+                      "type": "string",
+                      "description": "Quantity of the selected product.",
+                      "example": "1"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateOrderResponse": {
+        "type": "object",
+        "description": "The response returned after successfully creating a business formation order.",
+        "properties": {
+          "statusCode": {
+            "type": "integer",
+            "description": "HTTP status code indicating the result of the request.",
+            "example": 201
+          },
+          "message": {
+            "type": "string",
+            "description": "Status message indicating the result.",
+            "example": "success"
+          },
+          "data": {
+            "type": "object",
+            "description": "Contains the created order details.",
+            "properties": {
+              "partnerOrder": {
+                "type": "object",
+                "description": "The partner's submitted order with assigned metadata.",
+                "properties": {
+                  "orderGuid": {
+                    "type": "string",
+                    "description": "Unique identifier for the created order.",
+                    "example": "801VB00000LcJlVYAV"
+                  },
+                  "orderPhase": {
+                    "type": "string",
+                    "description": "Current processing phase of the order.",
+                    "example": "Order Received"
+                  },
+                  "orderStatus": {
+                    "type": "string",
+                    "description": "Current status of the order.",
+                    "example": "Third Party Received"
+                  },
+                  "orderFilingType": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Type of filing service selected (if any).",
+                    "example": null
+                  },
+                  "apiUserPid": {
+                    "type": "string",
+                    "description": "API user ID that initiated the order.",
+                    "example": "14684"
+                  },
+                  "pcid": {
+                    "type": "string",
+                    "description": "Partner Client ID.",
+                    "example": "gregerger"
+                  },
+                  "businessStructureType": {
+                    "type": "string",
+                    "description": "Full description of the business structure selected.",
+                    "example": "Limited Liability Company (LLC)"
+                  },
+                  "businessStateInitial": {
+                    "type": "string",
+                    "description": "State abbreviation where the business is being formed."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "OrderSummary": {
+        "type": "object",
+        "description": "The response containing a summary of a submitted business formation order.",
+        "properties": {
+          "statusCode": {
+            "type": "string",
+            "description": "HTTP status code of the response.",
+            "example": "200"
+          },
+          "message": {
+            "type": "string",
+            "description": "A human-readable message indicating success or error.",
+            "example": "OK"
+          },
+          "order": {
+            "type": "object",
+            "description": "Summary details of the business formation order.",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Unique identifier of the order.",
+                "example": "801VB00000LcJlVYAV"
+              },
+              "orderNumber": {
+                "type": "string",
+                "description": "Public-facing order number assigned to the order.",
+                "example": "07237721"
+              },
+              "orderTotal": {
+                "type": "number",
+                "format": "float",
+                "description": "Total price of the order including all selected products.",
+                "example": 298.04
+              },
+              "orderProducts": {
+                "type": "array",
+                "description": "List of all products included in the order with their respective values.",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the ordered product or service.",
+                      "example": "Obtain Federal Tax ID Number (EIN)"
+                    },
+                    "value": {
+                      "type": "number",
+                      "format": "float",
+                      "description": "Price or value of the individual product in USD.",
+                      "example": 33
+                    },
+                    "sortOrder": {
+                      "type": "integer",
+                      "description": "Sort order indicator for product display.",
+                      "example": 2
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "statusCode": "200",
+          "message": "OK",
+          "order": {
+            "id": "801VB00000LcJlVYAV",
+            "orderNumber": "07237721",
+            "orderTotal": 298.04,
+            "orderProducts": [
+              {
+                "name": "Obtain Federal Tax ID Number (EIN)",
+                "value": 33,
+                "sortOrder": 2
+              },
+              {
+                "name": "Custom Operating Agreement and Minutes",
+                "value": 34,
+                "sortOrder": 2
+              },
+              {
+                "name": "FREE Corporate Compliance Tool",
+                "value": 0,
+                "sortOrder": 2
+              },
+              {
+                "name": "California Registered Agent Service",
+                "value": 2.92,
+                "sortOrder": 3
+              },
+              {
+                "name": "CUSTOMIZED LLC Kit & Seal",
+                "value": 54,
+                "sortOrder": 2
+              },
+              {
+                "name": "Print Delivery",
+                "value": 29,
+                "sortOrder": 4
+              },
+              {
+                "name": "California Official Filed Articles of Organization",
+                "value": 79,
+                "sortOrder": 2
+              },
+              {
+                "name": "Name Availability Check",
+                "value": 34,
+                "sortOrder": 2
+              },
+              {
+                "name": "Organizer Resolutions",
+                "value": 0,
+                "sortOrder": 2
+              }
+            ]
+          }
+        }
+      },
+      "OrderDetail": {
+        "type": "object",
+        "description": "The full response containing all details of a submitted business formation order.",
+        "properties": {
+          "statusCode": {
+            "type": "string",
+            "description": "HTTP status code of the response.",
+            "example": "200"
+          },
+          "message": {
+            "type": "string",
+            "description": "A human-readable message indicating success or failure.",
+            "example": "OK"
+          },
+          "data": {
+            "type": "object",
+            "description": "Wrapper for partner order data.",
+            "properties": {
+              "partnerOrder": {
+                "type": "object",
+                "description": "Full detail of the submitted business formation order.",
+                "properties": {
+                  "orderGuid": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Unique identifier assigned to the order.",
+                    "example": null
+                  },
+                  "orderPhase": {
+                    "type": "string",
+                    "description": "The current phase of the order lifecycle.",
+                    "example": "Order Received"
+                  },
+                  "orderStatus": {
+                    "type": "string",
+                    "description": "Current status of the order in the system.",
+                    "example": "Third Party Received"
+                  },
+                  "orderFilingType": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Filing type of the order, if applicable.",
+                    "example": null
+                  },
+                  "apiUserPid": {
+                    "type": "string",
+                    "description": "ID of the API user who submitted the order.",
+                    "example": "14684"
+                  },
+                  "pcid": {
+                    "type": "string",
+                    "description": "Partner Client Identifier.",
+                    "example": "gregerger"
+                  },
+                  "businessStructureType": {
+                    "type": "string",
+                    "description": "Full name of the selected business entity structure.",
+                    "example": "Limited Liability Company (LLC)"
+                  },
+                  "businessStateInitial": {
+                    "type": "string",
+                    "description": "Full name of the U.S. state where the business is being formed.",
+                    "example": "California"
+                  },
+                  "orderTotalPrice": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "Total price of the order in USD.",
+                    "example": 298.04
+                  },
+                  "contact": {
+                    "type": "object",
+                    "description": "Contact person information for the order.",
+                    "properties": {
+                      "contactEmail": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "test1@test.com"
+                      },
+                      "contactFirstName": {
+                        "type": "string",
+                        "example": "test"
+                      },
+                      "contactLastName": {
+                        "type": "string",
+                        "example": "test"
+                      },
+                      "contactPhone": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": null
+                      },
+                      "contactEveningPhone": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": null
+                      }
+                    }
+                  },
+                  "companyInfo": {
+                    "type": "object",
+                    "description": "Information about the company being formed.",
+                    "properties": {
+                      "companyDesiredName": {
+                        "type": "string",
+                        "example": "Test company"
+                      },
+                      "companyAlternativeName": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": null
+                      },
+                      "companyBusinessDescription": {
+                        "type": "string",
+                        "example": "testing"
+                      },
+                      "companyBusinessCategory": {
+                        "type": "string",
+                        "example": "OTHER"
+                      }
+                    }
+                  },
+                  "businessAddress": {
+                    "type": "object",
+                    "description": "Physical address where the business will be located.",
+                    "properties": {
+                      "businessAddressCountry": {
+                        "type": "string",
+                        "example": "United States"
+                      },
+                      "businessAddressAddress1": {
+                        "type": "string",
+                        "example": "test"
+                      },
+                      "businessAddressAddress2": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": null
+                      },
+                      "businessAddressCity": {
+                        "type": "string",
+                        "example": "test"
+                      },
+                      "businessAddressState": {
+                        "type": "string",
+                        "nullable": true,
+                        "example": null
+                      },
+                      "businessAddressZip": {
+                        "type": "string",
+                        "example": "78671"
+                      }
+                    }
+                  },
+                  "registerAgent": {
+                    "type": "object",
+                    "nullable": true,
+                    "description": "Registered agent information if available.",
+                    "example": null
+                  },
+                  "responsibleParty": {
+                    "type": "object",
+                    "nullable": true,
+                    "description": "Responsible party details if provided.",
+                    "example": null
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "statusCode": "200",
+          "message": "OK",
+          "data": {
+            "partnerOrder": {
+              "orderGuid": null,
+              "orderPhase": "Order Received",
+              "orderStatus": "Third Party Received",
+              "orderFilingType": null,
+              "apiUserPid": "14684",
+              "pcid": "gregerger",
+              "businessStructureType": "Limited Liability Company (LLC)",
+              "businessStateInitial": "California",
+              "orderTotalPrice": 298.04,
+              "contact": {
+                "contactEmail": "test1@test.com",
+                "contactFirstName": "test",
+                "contactLastName": "test",
+                "contactPhone": null,
+                "contactEveningPhone": null
+              },
+              "companyInfo": {
+                "companyDesiredName": "Test company",
+                "companyAlternativeName": null,
+                "companyBusinessDescription": "testing",
+                "companyBusinessCategory": "OTHER"
+              },
+              "businessAddress": {
+                "businessAddressCountry": "United States",
+                "businessAddressAddress1": "test",
+                "businessAddressAddress2": null,
+                "businessAddressCity": "test",
+                "businessAddressState": null,
+                "businessAddressZip": "78671"
+              },
+              "registerAgent": null,
+              "responsibleParty": null
+            }
+          }
+        }
+      },
+      "PackageResponse": {
+        "type": "object",
+        "description": "The response object containing available business formation packages.",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "A human-readable status message.",
+            "example": "OK"
+          },
+          "statusCode": {
+            "type": "string",
+            "description": "The HTTP status code of the response in string format.",
+            "example": "200"
+          },
+          "value": {
+            "type": "object",
+            "description": "Contains the package collection based on query parameters.",
+            "properties": {
+              "packageCollection": {
+                "type": "array",
+                "description": "A list of available formation packages.",
+                "items": {
+                  "type": "object",
+                  "description": "Details of a specific package offering.",
+                  "properties": {
+                    "entityType": {
+                      "type": "string",
+                      "description": "The type of business entity the package applies to (e.g., llc, corp).",
+                      "example": "llc"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "The name of the package (e.g., Basic Package, Premium Package).",
+                      "example": "Basic Package"
+                    },
+                    "state": {
+                      "type": "string",
+                      "description": "The U.S. state where the package is applicable.",
+                      "example": "California"
+                    },
+                    "productPackages": {
+                      "type": "array",
+                      "description": "List of individual services or features included in the package.",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "The name of the service included in the package.",
+                            "example": "Name Availability Check"
+                          },
+                          "price": {
+                            "type": "number",
+                            "format": "float",
+                            "description": "The price of the individual service in USD.",
+                            "example": 34
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "example": {
+          "message": "OK",
+          "statusCode": "200",
+          "value": {
+            "packageCollection": [
+              {
+                "entityType": "llc",
+                "name": "Basic Package",
+                "state": "California",
+                "productPackages": [
+                  {
+                    "name": "Name Availability Check",
+                    "price": 34
+                  },
+                  {
+                    "name": "Print Delivery",
+                    "price": 29
+                  },
+                  {
+                    "name": "Operating Agreement",
+                    "price": 34
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

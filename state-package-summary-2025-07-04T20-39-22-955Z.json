@@ -1,0 +1,38 @@
+{
+  "generatedAt": "2025-07-04T20:39:22.957Z",
+  "totalStates": 1,
+  "successfulStates": 1,
+  "failedStates": 0,
+  "stateSummaries": [
+    {
+      "stateName": "Alabama",
+      "stateAbbr": "AL",
+      "success": true,
+      "packageCount": 3,
+      "packages": [
+        {
+          "id": "d474a63d-a52f-4f7f-b71f-f10a69937bcd",
+          "name": "Basic",
+          "price": "$99.00",
+          "totalPrice": "$364.00",
+          "isDefaultPackage": false
+        },
+        {
+          "id": "46c418ef-3a70-4009-b480-94c1df63f7a0",
+          "name": "Deluxe",
+          "price": "$219.00",
+          "totalPrice": "$484.00",
+          "isDefaultPackage": false
+        },
+        {
+          "id": "7c6cc23c-3695-48c0-9223-e78df764d226",
+          "name": "Complete",
+          "price": "$269.00",
+          "totalPrice": "$534.00",
+          "isDefaultPackage": true
+        }
+      ],
+      "error": null
+    }
+  ]
+}
