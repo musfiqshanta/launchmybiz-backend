@@ -1,23 +1,19 @@
 require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const corpnet = require('@api/corpnet');
 const Business=require('../models/BusinessSchema');
-const route=require('./routes/admin');
 const router = require('./routes/admin');
+const customersRouter = require('./routes/customers');
 const { sendConfirmationEmail, sendAdminOrderAlert } = require('./lib/emailService');
+const { connectToDatabase } = require('./lib/db');
 corpnet.auth(process.env.CORPNET_API_KEY);
 const axios =require('axios')
 const app = express();
 const PORT = process.env.PORT || 5001;
 const cookieParser = require('cookie-parser');
 const API_URL = 'https://staging22api.corpnet.com/api/business-formation/package';
-
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB connected successfully.'))
-  .catch(err => console.error('MongoDB connection error:', err));
 
  
   
@@ -206,6 +202,9 @@ app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), async
 
 app.use(express.json());
 
+// Customer auth routes
+app.use('/api/customers', customersRouter);
+
 
 app.post('/api/create-checkout-session', async (req, res) => {
   const formData = req.body.payload;
@@ -316,4 +315,12 @@ app.get('/api/business-formation-package', async (req, res) => {
 //   .then(({ data }) => console.log(data))
 //   .catch(err => console.error(err));
 app.use('/api/admin',router)
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+
+connectToDatabase()
+  .then(() => {
+    app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+  })
+  .catch((error) => {
+    console.error('Failed to start server due to DB connection error:', error);
+    process.exit(1);
+  });
